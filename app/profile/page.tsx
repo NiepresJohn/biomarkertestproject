@@ -49,11 +49,17 @@ export default function ProfilePage() {
       try {
         const response = await fetch('/api/profile');
         const data = await response.json();
-        setProfile(data);
-        setPhone(data.phone || '+1 (555) 123-4567');
-        setAddress(data.address || '123 Main St, San Francisco, CA 94102');
+
+        // Check if the response is successful and has valid data
+        if (response.ok && !data.error && data.id) {
+          setProfile(data);
+          setPhone(data.phone || '+1 (555) 123-4567');
+          setAddress(data.address || '123 Main St, San Francisco, CA 94102');
+        } else {
+          setProfile(null);
+        }
       } catch (error) {
-        // Error handled by loading state
+        setProfile(null);
       } finally {
         setLoading(false);
       }
@@ -114,6 +120,13 @@ export default function ProfilePage() {
       try {
         const response = await fetch('/api/biomarkers');
         const data = await response.json();
+
+        // Check if the response is successful
+        if (!response.ok || data.error) {
+          setBiomarkerCount(0);
+          return;
+        }
+
         const list = data.biomarkers ?? data;
 
         if (Array.isArray(list)) {

@@ -23,19 +23,32 @@ export default function BiomarkersPage() {
         const response = await fetch('/api/biomarkers');
         const data = await response.json();
 
-        if (data.biomarkers) {
+        // Check if the response is an error
+        if (!response.ok || data.error) {
+          showError(data.error || 'Failed to load biomarkers');
+          setBiomarkers([]);
+          return;
+        }
+
+        // Handle new API format: { biomarkers: [...], debug: [...] }
+        if (data.biomarkers && Array.isArray(data.biomarkers)) {
           setBiomarkers(data.biomarkers);
-        } else {
+        } else if (Array.isArray(data)) {
+          // Fallback for old format (array of biomarkers)
           setBiomarkers(data);
+        } else {
+          // Invalid format
+          setBiomarkers([]);
         }
       } catch (error) {
         showError('Failed to load biomarkers');
+        setBiomarkers([]);
       } finally {
         setLoading(false);
       }
     }
     loadData();
-  }, []);
+  }, [showError]);
 
   const handleCardClick = (biomarker: Biomarker) => {
     setSelectedBiomarker(biomarker);

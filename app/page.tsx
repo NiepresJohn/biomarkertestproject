@@ -25,7 +25,10 @@ export default function Home() {
         const response = await fetch('/api/profile');
         if (response.ok) {
           const data = await response.json();
-          setProfile(data);
+          // Check if the data is valid and not an error
+          if (!data.error && data.id) {
+            setProfile(data);
+          }
         }
       } catch (error) {
         // Silently fail - profile is optional for display
@@ -41,15 +44,26 @@ export default function Home() {
         const response = await fetch('/api/biomarkers');
         const data = await response.json();
 
+        // Check if the response is an error
+        if (!response.ok || data.error) {
+          showError(data.error || 'Failed to load biomarkers');
+          setBiomarkers([]);
+          return;
+        }
+
         // Handle new API format: { biomarkers: [...], debug: [...] }
-        if (data.biomarkers) {
+        if (data.biomarkers && Array.isArray(data.biomarkers)) {
           setBiomarkers(data.biomarkers);
-        } else {
+        } else if (Array.isArray(data)) {
           // Fallback for old format (array of biomarkers)
           setBiomarkers(data);
+        } else {
+          // Invalid format
+          setBiomarkers([]);
         }
       } catch (error) {
         showError('Failed to load biomarkers');
+        setBiomarkers([]);
       } finally {
         setLoading(false);
       }
