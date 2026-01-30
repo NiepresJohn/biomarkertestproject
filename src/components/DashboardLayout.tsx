@@ -93,7 +93,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="border-t border-neutral-200 pt-4">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs">
-                {profile ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
+                {profile?.full_name ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-medium text-neutral-700">

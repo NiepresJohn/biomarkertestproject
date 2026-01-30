@@ -166,15 +166,16 @@ export default function Home() {
                   <div className="flex items-start gap-4">
                     <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
                       {profile.full_name
-                        .split(' ')
+                        ? profile.full_name.split(' ')
                         .map((n) => n[0])
                         .join('')
                         .toUpperCase()
-                        .slice(0, 2)}
+                        .slice(0, 2)
+                        : 'U'}
                     </div>
                     <div className="min-w-0">
                       <p className="font-medium text-gray-900 truncate">
-                        {profile.full_name}
+                        {profile.full_name || 'User'}
                       </p>
                       <p className="text-sm text-gray-500 mt-0.5">
                         {profile.sex === 'male' ? 'Male' : 'Female'} · {profile.age} years old

@@ -187,11 +187,12 @@ export default function ProfilePage() {
   }
 
   const initials = profile.full_name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+    ? profile.full_name.split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : 'U';
   const patientId = profile.id.split('-')[0].toUpperCase();
 
   return (
@@ -247,7 +248,7 @@ export default function ProfilePage() {
                 <div className="px-6 pb-6 pt-2">
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">
-                      {profile.full_name}
+                      {profile.full_name || 'User'}
                     </h2>
                     <p className="mt-1 text-xs font-medium uppercase tracking-wider text-gray-500">
                       Patient ID · {patientId}
