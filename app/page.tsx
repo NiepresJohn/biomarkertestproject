@@ -1,65 +1,230 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Biomarker, Profile } from '@/src/types/biomarker';
+import { BiomarkerCard } from '@/src/components/BiomarkerCard';
+import { BiomarkerModal } from '@/src/components/BiomarkerModal';
+import { DashboardLayout } from '@/src/components/DashboardLayout';
+import { Activity, AlertCircle, CheckCircle, User } from 'lucide-react';
+import { Footer } from '@/src/components/Footer';
+import { useNotification } from '@/src/contexts/NotificationContext';
 
 export default function Home() {
+  const [biomarkers, setBiomarkers] = useState<Biomarker[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [selectedBiomarker, setSelectedBiomarker] = useState<Biomarker | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { showError } = useNotification();
+
+  // Load profile on mount
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const response = await fetch('/api/profile');
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(data);
+        }
+      } catch (error) {
+        // Silently fail - profile is optional for display
+      }
+    }
+    loadProfile();
+  }, []);
+
+  // Load data on mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await fetch('/api/biomarkers');
+        const data = await response.json();
+
+        // Handle new API format: { biomarkers: [...], debug: [...] }
+        if (data.biomarkers) {
+          setBiomarkers(data.biomarkers);
+        } else {
+          // Fallback for old format (array of biomarkers)
+          setBiomarkers(data);
+        }
+      } catch (error) {
+        showError('Failed to load biomarkers');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [showError]);
+
+  const handleCardClick = (biomarker: Biomarker) => {
+    setSelectedBiomarker(biomarker);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedBiomarker(null), 300);
+  };
+
+  // Calculate stats
+  const optimalCount = biomarkers.filter(b => b.status === 'optimal').length;
+  const outOfRangeCount = biomarkers.filter(b => b.status === 'out-of-range').length;
+  const totalCount = biomarkers.length;
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <div className="text-gray-600 dark:text-gray-400">Loading biomarkers...</div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <DashboardLayout>
+      <div className="min-h-full bg-gray-50 flex flex-col">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-gray-900 mb-1 sm:text-2xl lg:text-3xl sm:mb-2">
+              Health Dashboard
+            </h1>
+            <p className="text-sm text-gray-600 sm:text-base">
+              Welcome back! Here's your health overview for today
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Dashboard Overview */}
+        <div className="flex-1 px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-3 sm:gap-6 sm:mb-8">
+            <div className="bg-white rounded-lg p-5 border border-gray-200 sm:p-7">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm text-gray-600 mb-1.5 sm:text-base">Total Biomarkers</p>
+                  <p className="text-3xl font-bold text-gray-900 sm:text-4xl">{totalCount}</p>
+                </div>
+                <div className="h-14 w-14 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                  <Activity className="h-7 w-7 text-blue-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-5 border border-gray-200 sm:p-7">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm text-gray-600 mb-1.5 sm:text-base">Optimal</p>
+                  <p className="text-3xl font-bold text-green-600 sm:text-4xl">{optimalCount}</p>
+                </div>
+                <div className="h-14 w-14 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
+                  <CheckCircle className="h-7 w-7 text-green-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-5 border border-gray-200 sm:p-7">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm text-gray-600 mb-1.5 sm:text-base">Needs Attention</p>
+                  <p className="text-3xl font-bold text-red-600 sm:text-4xl">{outOfRangeCount}</p>
+                </div>
+                <div className="h-14 w-14 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
+                  <AlertCircle className="h-7 w-7 text-red-600" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Biomarkers + Schedule */}
+          <div className="grid grid-cols-1 gap-4 mb-6 lg:grid-cols-3 lg:gap-6 lg:mb-8">
+            <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-5 sm:p-6 min-w-0">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3 sm:text-xl sm:mb-4">
+                Recent Biomarkers
+              </h2>
+              <div className="space-y-3 sm:space-y-4">
+                {biomarkers.map((biomarker) => (
+                  <BiomarkerCard
+                    key={biomarker.id}
+                    biomarker={biomarker}
+                    onClick={() => handleCardClick(biomarker)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 lg:gap-6 min-w-0">
+              {/* Profile card */}
+              <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 h-fit">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3 sm:text-xl sm:mb-4">Profile</h2>
+                {profile ? (
+                  <div className="flex items-start gap-4">
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+                      {profile.full_name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium text-gray-900 truncate">
+                        {profile.full_name}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        {profile.sex === 'male' ? 'Male' : 'Female'} · {profile.age} years old
+                      </p>
+                      {profile.birthdate && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          Born {new Date(profile.birthdate).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3 text-gray-500">
+                    <User className="h-10 w-10 text-gray-300" />
+                    <p className="text-sm">Loading profile...</p>
+                  </div>
+                )}
+                <Link
+                  href="/profile"
+                  className="mt-4 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
+                >
+                  View full profile →
+                </Link>
+              </div>
+
+              {/* Schedule card */}
+              <Link
+                href="/schedule"
+                className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-4 sm:p-6 text-white block hover:opacity-95 transition-opacity h-fit"
+              >
+                <h3 className="text-base font-semibold mb-1.5 sm:text-lg sm:mb-2">Schedule Your Next Test</h3>
+                <p className="text-blue-100 text-sm mb-3 sm:mb-4">
+                  It's time for your routine checkup. Book an appointment today.
+                </p>
+                <span className="inline-block bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition">
+                  Schedule Now
+                </span>
+              </Link>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+
+        <Footer />
+      </div>
+
+      <BiomarkerModal
+        biomarker={selectedBiomarker}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </DashboardLayout>
   );
 }
