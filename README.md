@@ -56,39 +56,30 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 
 ### 4. Database Setup
 
-Apply the database migration to create all tables, functions, and security policies:
+**📖 Complete setup guide:** See `supabase/migrations/DB_SETUP.md` for detailed instructions.
 
-**Option 1: Using Supabase Dashboard (Recommended for Quick Setup)**
-1. Go to your Supabase project dashboard
-2. Navigate to **SQL Editor**
-3. Copy the contents of `supabase/migrations/20260131_complete_database_setup.sql`
-4. Paste into the SQL Editor and click **Run**
+**Quick Start:**
 
-**Option 2: Using Supabase CLI**
-```bash
-# Install Supabase CLI (if not already installed)
-npm install -g supabase
+1. **Run the main migration** to create all tables and security policies:
+   - Go to Supabase Dashboard → **SQL Editor**
+   - Copy contents of `supabase/migrations/20260131_complete_database_setup.sql`
+   - Paste and click **Run**
 
-# Link your project
-supabase link --project-ref YOUR_PROJECT_REF
+2. **Enable anonymous access** (for MVP - required for app to work):
+   - Copy contents of `supabase/migrations/20260131_enable_anon_access.sql`
+   - Paste in SQL Editor and click **Run**
+   - ⚠️ Note: For production, implement authentication and remove this policy
 
-# Apply migrations
-supabase db push
-```
+3. **Add sample data** (choose one):
+   - **Via API:** `curl -X POST https://your-site.vercel.app/api/setup-database`
+   - **Via SQL:** Copy contents of `supabase/seed.sql` and run in SQL Editor
 
 **What gets created:**
 - **7 tables**: profiles, reference_ranges, biomarker_results, appointments, biomarkers, biomarker_readings, range_bands
 - **2 secure functions**: update_updated_at_column(), update_appointments_updated_at()
-- **3 triggers**: For auto-updating timestamp columns
-- **Optimized RLS policies**: Secure, performant row-level security
-- **Indexes**: For query performance
-
-**Security & Performance:**
-The migration resolves 77 Supabase warnings:
-- ✓ Function search_path security issues
-- ✓ Overly permissive RLS policies
-- ✓ Auth RLS performance optimizations
-- ✓ Multiple permissive policies conflicts
+- **3 triggers**: Automatic timestamp updates
+- **Optimized RLS policies**: Secure, performant row-level security (77 warnings resolved)
+- **Performance indexes**: Foreign keys and frequently queried columns
 
 ### 5. Run Development Server
 ```bash
@@ -105,7 +96,8 @@ biomarkertestproject/
 │   ├── api/                         # API endpoints
 │   │   ├── biomarkers/route.ts     # GET/POST biomarkers
 │   │   ├── profile/route.ts        # GET/PATCH profile
-│   │   └── appointments/           # Appointment CRUD
+│   │   ├── appointments/           # Appointment CRUD
+│   │   └── setup-database/route.ts # Database initialization endpoint
 │   ├── biomarkers/page.tsx         # Biomarkers list with filtering
 │   ├── schedule/page.tsx           # Appointment calendar
 │   ├── profile/page.tsx            # User profile management
@@ -135,9 +127,12 @@ biomarkertestproject/
 │   └── data/
 │       └── biomarkers.csv         # Sample biomarker data
 │
-├── supabase/                       # Supabase configuration
-│   └── migrations/                # Database migrations
-│       └── 20260131_complete_database_setup.sql  # Full schema setup
+├── supabase/                       # Database configuration
+│   ├── migrations/                # Database migrations
+│   │   ├── 20260131_complete_database_setup.sql  # Full schema setup
+│   │   ├── 20260131_enable_anon_access.sql       # Anonymous access (MVP)
+│   │   └── DB_SETUP.md            # Complete database setup guide
+│   └── seed.sql                   # Sample data for testing
 │
 ├── package.json                    # Dependencies
 ├── tsconfig.json                   # TypeScript config
@@ -284,6 +279,27 @@ Metabolic Health Score Graph Value: 78
 
 ## API Routes
 
+### POST /api/setup-database
+Initializes database with sample data (profiles, reference ranges, biomarker results).
+
+**Response:**
+```json
+{
+  "success": true,
+  "successes": [
+    "Profile created successfully",
+    "Created 18 reference ranges",
+    "Created biomarker results",
+    "Created sample appointments"
+  ]
+}
+```
+
+**Usage:**
+```bash
+curl -X POST https://your-site.vercel.app/api/setup-database
+```
+
 ### GET /api/biomarkers
 Fetches biomarkers with profile-based ranges.
 
@@ -408,16 +424,23 @@ npm run build
 ### Vercel Deployment
 
 1. **Connect Repository** to Vercel
-2. **Set Environment Variables**:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+2. **Set Environment Variables** in Vercel Dashboard:
+   - `NEXT_PUBLIC_SUPABASE_URL` (required)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (required)
+   - `SUPABASE_SERVICE_ROLE_KEY` (optional, for admin operations)
 3. **Deploy** (automatic on git push)
+4. **Initialize Database** after first deployment:
+   - Navigate to `https://your-site.vercel.app/api/setup-database`
+   - Send POST request to create sample data
+   - Or manually run SQL migrations (see `supabase/migrations/DB_SETUP.md`)
 
 **Production Considerations:**
-- Enable Supabase RLS policies for security
-- Configure user authentication (currently public access)
-- Set up monitoring for API errors
-- Configure CORS if needed for custom domains
+- ⚠️ **Security:** Remove anonymous access policies before going live
+- Implement user authentication (Supabase Auth or NextAuth.js)
+- Enable proper RLS policies based on authenticated users
+- Set up error monitoring (Sentry, LogRocket, etc.)
+- Configure database backups in Supabase Dashboard
+- Review and test all API endpoints for security vulnerabilities
 
 ### Environment Variables in Production
 
@@ -430,11 +453,11 @@ npm run build
 ## Troubleshooting
 
 **Issue: No biomarkers displayed**
-- Check console for API errors
+- Check browser console for API errors
 - Verify environment variables in `.env.local` are set correctly
-- Verify database migration was applied successfully in Supabase Dashboard
-- Check that tables exist: Go to Supabase Dashboard → Table Editor
-- Ensure you have sample data: Insert test records via Supabase Dashboard or API
+- Verify database migration was applied: Supabase Dashboard → Table Editor
+- Check that anonymous access policy is enabled (see `supabase/migrations/DB_SETUP.md`)
+- Add sample data using `/api/setup-database` endpoint or run `supabase/seed.sql`
 
 **Issue: Wrong reference ranges shown**
 - Check user profile age and sex in `/profile` page
@@ -472,7 +495,7 @@ For questions, issues, or feedback about this project, please contact:
 You can also:
 - Open an issue in the GitHub repository
 - Check the documentation in this README
-- Review the migration guide in `supabase/migrations/README.md`
+- Review the database setup guide in `supabase/migrations/DB_SETUP.md`
 
 ## License
 
