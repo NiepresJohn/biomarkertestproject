@@ -5,7 +5,7 @@ import { Biomarker } from '@/src/types/biomarker';
 import { BiomarkerCard } from '@/src/components/BiomarkerCard';
 import { BiomarkerModal } from '@/src/components/BiomarkerModal';
 import { DashboardLayout } from '@/src/components/DashboardLayout';
-import { Activity, Filter } from 'lucide-react';
+import { Activity, Filter, FileDown } from 'lucide-react';
 import { Footer } from '@/src/components/Footer';
 import { useNotification } from '@/src/contexts/NotificationContext';
 
@@ -64,6 +64,10 @@ export default function BiomarkersPage() {
     ? biomarkers
     : biomarkers.filter(b => b.status === filter);
 
+  const handleExportToPDF = () => {
+    window.print();
+  };
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -93,72 +97,118 @@ export default function BiomarkersPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-            <Filter className="h-5 w-5 text-gray-500 shrink-0" />
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setFilter('all')}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
-                  filter === 'all'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                All ({biomarkers.length})
-              </button>
-              <button
-                onClick={() => setFilter('optimal')}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
-                  filter === 'optimal'
-                    ? 'bg-green-100 text-green-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Optimal ({biomarkers.filter(b => b.status === 'optimal').length})
-              </button>
-              <button
-                onClick={() => setFilter('in-range')}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
-                  filter === 'in-range'
-                    ? 'bg-orange-100 text-orange-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                In Range ({biomarkers.filter(b => b.status === 'in-range').length})
-              </button>
-              <button
-                onClick={() => setFilter('out-of-range')}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
-                  filter === 'out-of-range'
-                    ? 'bg-red-100 text-red-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Out of Range ({biomarkers.filter(b => b.status === 'out-of-range').length})
-              </button>
+        <div className="bg-white border-b border-gray-200 px-4 py-3 sm:px-6 sm:py-4 lg:px-8 print-hide">
+          <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <Filter className="h-5 w-5 text-gray-500 shrink-0" />
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setFilter('all')}
+                  className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
+                    filter === 'all'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  All ({biomarkers.length})
+                </button>
+                <button
+                  onClick={() => setFilter('optimal')}
+                  className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
+                    filter === 'optimal'
+                      ? 'bg-green-100 text-green-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Optimal ({biomarkers.filter(b => b.status === 'optimal').length})
+                </button>
+                <button
+                  onClick={() => setFilter('in-range')}
+                  className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
+                    filter === 'in-range'
+                      ? 'bg-orange-100 text-orange-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  In Range ({biomarkers.filter(b => b.status === 'in-range').length})
+                </button>
+                <button
+                  onClick={() => setFilter('out-of-range')}
+                  className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
+                    filter === 'out-of-range'
+                      ? 'bg-red-100 text-red-700'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Out of Range ({biomarkers.filter(b => b.status === 'out-of-range').length})
+                </button>
+              </div>
             </div>
+
+            {/* Export to PDF button */}
+            <button
+              onClick={handleExportToPDF}
+              className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-gray-900 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-800 transition print:hidden"
+            >
+              <FileDown className="h-4 w-4" />
+              <span className="hidden sm:inline">Export to PDF</span>
+              <span className="sm:hidden">PDF</span>
+            </button>
           </div>
         </div>
 
         {/* Biomarkers List */}
         <div className="flex-1 px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
           <div className="max-w-[1200px] mx-auto min-w-0">
+            {/* Print-only title */}
+            <div className="hidden print-title">
+              Biomarker Report
+              <div style={{ fontSize: '14px', fontWeight: 'normal', marginTop: '8px' }}>
+                Generated on {new Date().toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+                {filter !== 'all' && ` - Filter: ${filter.charAt(0).toUpperCase() + filter.slice(1).replace('-', ' ')}`}
+              </div>
+            </div>
+
             {filteredBiomarkers.length === 0 ? (
               <div className="text-center py-12">
                 <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600">No biomarkers found with this filter.</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {filteredBiomarkers.map((biomarker) => (
-                  <BiomarkerCard
-                    key={biomarker.id}
-                    biomarker={biomarker}
-                    onClick={() => handleCardClick(biomarker)}
-                  />
-                ))}
-              </div>
+              <>
+                {/* Column Headers - hidden on mobile, visible on tablet+ */}
+                <div className="hidden sm:grid sm:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr_1fr] sm:gap-x-6 sm:px-4 sm:pb-3 sm:mb-4 print-grid-4col">
+                  <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Biomarker
+                  </div>
+                  <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Status
+                  </div>
+                  <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Result
+                  </div>
+                  <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Reference
+                  </div>
+                  <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right print-hide">
+                    Range
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {filteredBiomarkers.map((biomarker) => (
+                    <BiomarkerCard
+                      key={biomarker.id}
+                      biomarker={biomarker}
+                      onClick={() => handleCardClick(biomarker)}
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>

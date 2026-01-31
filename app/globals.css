@@ -172,3 +172,70 @@ body {
 .heart-beat {
   animation: heartBeat 1.2s ease-in-out infinite;
 }
+
+/* Print styles for PDF export */
+@media print {
+  /* Hide navigation, sidebars, buttons, and footer */
+  nav,
+  aside,
+  footer,
+  button,
+  .print-hide {
+    display: none !important;
+  }
+
+  /* Reset page styling */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Optimize page layout */
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+
+  /* Make sure content fits well */
+  * {
+    box-shadow: none !important;
+  }
+
+  /* Keep cards and content readable */
+  .bg-white,
+  .bg-gray-50 {
+    background: white !important;
+  }
+
+  /* Remove borders that don't look good in print */
+  .border-gray-200 {
+    border-color: #e5e7eb !important;
+  }
+
+  /* Ensure text is black for readability */
+  .text-gray-900,
+  .text-gray-800,
+  .text-gray-700,
+  .text-gray-600 {
+    color: black !important;
+  }
+
+  /* Page breaks */
+  .break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Add title to printed page */
+  .print-title {
+    display: block !important;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: black !important;
+  }
+
+  /* Adjust grid to 4 columns (hide Range column) */
+  .print-grid-4col {
+    grid-template-columns: minmax(0, 1.5fr) 1fr 1fr 1fr !important;
+  }
+}

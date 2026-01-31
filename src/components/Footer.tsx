@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <div className="pt-8 pb-6 pr-6 text-right">
+    <div className="pt-8 pb-6 pr-6 text-right print-hide">
       <a
         href="https://niepresjohn.com/"
         target="_blank"

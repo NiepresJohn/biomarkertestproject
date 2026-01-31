@@ -35,7 +35,7 @@ export function BiomarkerCard({ biomarker, onClick }: BiomarkerCardProps) {
       }}
     >
       {/* Mobile: stack. Desktop: 5-column grid with equal gap (gap-x-6) and equal padding (px-3) per column */}
-      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr_1fr] sm:items-center sm:gap-x-6 sm:gap-y-0">
+      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr_1fr] sm:items-center sm:gap-x-6 sm:gap-y-0 print-grid-4col">
         {/* Column 1: Biomarker Name */}
         <div className="min-w-0 px-0 sm:px-3 text-sm font-medium text-gray-900 truncate sm:text-base">
           {biomarker.name}
@@ -71,7 +71,7 @@ export function BiomarkerCard({ biomarker, onClick }: BiomarkerCardProps) {
         </div>
 
         {/* Column 5: Mini Range Indicator */}
-        <div className="flex justify-end min-w-0 sm:px-3">
+        <div className="flex justify-end min-w-0 sm:px-3 print-hide">
           <MiniIndicator biomarker={biomarker} />
         </div>
       </div>

@@ -161,6 +161,26 @@ export default function Home() {
               <h2 className="text-lg font-semibold text-gray-900 mb-3 sm:text-xl sm:mb-4">
                 Recent Biomarkers
               </h2>
+
+              {/* Column Headers - hidden on mobile, visible on tablet+ */}
+              <div className="hidden sm:grid sm:grid-cols-[minmax(0,1.5fr)_1fr_1fr_1fr_1fr] sm:gap-x-6 sm:px-4 sm:pb-3 sm:mb-1">
+                <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Biomarker
+                </div>
+                <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Status
+                </div>
+                <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Result
+                </div>
+                <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Reference
+                </div>
+                <div className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  Range
+                </div>
+              </div>
+
               <div className="space-y-3 sm:space-y-4">
                 {biomarkers.map((biomarker) => (
                   <BiomarkerCard

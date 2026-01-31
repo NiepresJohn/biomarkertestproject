@@ -99,10 +99,10 @@ export async function GET() {
         referenceRange,
       };
 
-      // Set custom graph domain for Creatinine
+      // Set custom graph domain for Creatinine (from CSV reference data)
       if (result.biomarker_name.toLowerCase().includes('creatinine')) {
-        biomarker.graphMin = 0.3;
-        biomarker.graphMax = 1.8;
+        biomarker.graphMin = 0.1;
+        biomarker.graphMax = 5.0;
       }
 
       biomarkers.push(biomarker);

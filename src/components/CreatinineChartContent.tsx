@@ -69,8 +69,8 @@ function getCreatinineCategory(
 
 /**
  * Y-axis labels for Creatinine
- * Domain: 0.3 - 1.8 mg/dL
- * Three bands: High (>1.2 or >1.1), Optimal (0.7-1.2 or 0.5-1.1), Low (<0.7 or <0.5)
+ * Domain: 0.1 - 5.0 mg/dL (from CSV reference data)
+ * Three bands: High (>optimal), Optimal (0.75-1.0 male, 0.6-0.9 female), Low (<optimal)
  */
 function getCreatinineYAxisRows(biomarker: Biomarker) {
   const { ranges } = biomarker;
@@ -104,17 +104,17 @@ function getCreatinineYAxisRows(biomarker: Biomarker) {
 
 /**
  * Map value to Y position for Creatinine
- * Y-axis domain: 0.3 - 1.8 mg/dL (visual domain)
- * Actual ranges: Low <0.7, Optimal 0.7-1.2, High >1.2 (for male)
+ * Y-axis domain: 0.1 - 5.0 mg/dL (visual domain from CSV)
+ * Actual ranges: Low <optimal, Optimal (0.75-1.0 male, 0.6-0.9 female), High >optimal
  */
 function creatinineValueToY(value: number, ranges: Biomarker['ranges']): number {
   const optimalRange = ranges.find(r => r.color === 'green');
-  const normalMin = optimalRange?.min ?? 0.7;
-  const normalMax = optimalRange?.max ?? 1.2;
+  const normalMin = optimalRange?.min ?? 0.75;
+  const normalMax = optimalRange?.max ?? 1.0;
 
-  // Visual domain for Y-axis
-  const DOMAIN_MIN = 0.3;
-  const DOMAIN_MAX = 1.8;
+  // Visual domain for Y-axis (from CSV reference data)
+  const DOMAIN_MIN = 0.1;
+  const DOMAIN_MAX = 5.0;
   const DOMAIN_SPAN = DOMAIN_MAX - DOMAIN_MIN;
 
   // Calculate which band and position within that band

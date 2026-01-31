@@ -31,59 +31,75 @@ ON CONFLICT (id) DO UPDATE SET
 -- ----------------------------------------------------------------------------
 -- REFERENCE RANGES - CREATININE
 -- ----------------------------------------------------------------------------
+-- Note: Creatinine uses ONLY optimal and out-of-range bands (no orange in-range band)
+-- Standard Reference Range Male: 0.7-1.2, Female: 0.5-1.1 (informational only)
+-- Graph Range: 0.1-5.0
+
 -- Male, 18-39
 INSERT INTO public.reference_ranges (biomarker_name, unit, sex, age_group, optimal_low, optimal_high, inrange_low, inrange_high, outofrange_low_rule, outofrange_high_rule)
-VALUES ('Creatinine', 'mg/dL', 'male', '18-39', 0.7, 1.0, 0.6, 1.2, '< 0.6', '> 1.2')
+VALUES ('Creatinine', 'mg/dL', 'male', '18-39', 0.75, 1.0, NULL, NULL, '< 0.75', '> 1.0')
 ON CONFLICT (biomarker_name, sex, age_group) DO UPDATE SET
     optimal_low = EXCLUDED.optimal_low,
     optimal_high = EXCLUDED.optimal_high,
     inrange_low = EXCLUDED.inrange_low,
-    inrange_high = EXCLUDED.inrange_high;
+    inrange_high = EXCLUDED.inrange_high,
+    outofrange_low_rule = EXCLUDED.outofrange_low_rule,
+    outofrange_high_rule = EXCLUDED.outofrange_high_rule;
 
 -- Male, 40-59
 INSERT INTO public.reference_ranges (biomarker_name, unit, sex, age_group, optimal_low, optimal_high, inrange_low, inrange_high, outofrange_low_rule, outofrange_high_rule)
-VALUES ('Creatinine', 'mg/dL', 'male', '40-59', 0.7, 1.1, 0.6, 1.3, '< 0.6', '> 1.3')
+VALUES ('Creatinine', 'mg/dL', 'male', '40-59', 0.75, 1.0, NULL, NULL, '< 0.75', '> 1.0')
 ON CONFLICT (biomarker_name, sex, age_group) DO UPDATE SET
     optimal_low = EXCLUDED.optimal_low,
     optimal_high = EXCLUDED.optimal_high,
     inrange_low = EXCLUDED.inrange_low,
-    inrange_high = EXCLUDED.inrange_high;
+    inrange_high = EXCLUDED.inrange_high,
+    outofrange_low_rule = EXCLUDED.outofrange_low_rule,
+    outofrange_high_rule = EXCLUDED.outofrange_high_rule;
 
 -- Male, 60+
 INSERT INTO public.reference_ranges (biomarker_name, unit, sex, age_group, optimal_low, optimal_high, inrange_low, inrange_high, outofrange_low_rule, outofrange_high_rule)
-VALUES ('Creatinine', 'mg/dL', 'male', '60+', 0.8, 1.2, 0.7, 1.4, '< 0.7', '> 1.4')
+VALUES ('Creatinine', 'mg/dL', 'male', '60+', 0.75, 1.0, NULL, NULL, '< 0.75', '> 1.0')
 ON CONFLICT (biomarker_name, sex, age_group) DO UPDATE SET
     optimal_low = EXCLUDED.optimal_low,
     optimal_high = EXCLUDED.optimal_high,
     inrange_low = EXCLUDED.inrange_low,
-    inrange_high = EXCLUDED.inrange_high;
+    inrange_high = EXCLUDED.inrange_high,
+    outofrange_low_rule = EXCLUDED.outofrange_low_rule,
+    outofrange_high_rule = EXCLUDED.outofrange_high_rule;
 
 -- Female, 18-39
 INSERT INTO public.reference_ranges (biomarker_name, unit, sex, age_group, optimal_low, optimal_high, inrange_low, inrange_high, outofrange_low_rule, outofrange_high_rule)
-VALUES ('Creatinine', 'mg/dL', 'female', '18-39', 0.5, 0.9, 0.5, 1.0, '< 0.5', '> 1.0')
+VALUES ('Creatinine', 'mg/dL', 'female', '18-39', 0.6, 0.9, NULL, NULL, '< 0.6', '> 0.9')
 ON CONFLICT (biomarker_name, sex, age_group) DO UPDATE SET
     optimal_low = EXCLUDED.optimal_low,
     optimal_high = EXCLUDED.optimal_high,
     inrange_low = EXCLUDED.inrange_low,
-    inrange_high = EXCLUDED.inrange_high;
+    inrange_high = EXCLUDED.inrange_high,
+    outofrange_low_rule = EXCLUDED.outofrange_low_rule,
+    outofrange_high_rule = EXCLUDED.outofrange_high_rule;
 
 -- Female, 40-59
 INSERT INTO public.reference_ranges (biomarker_name, unit, sex, age_group, optimal_low, optimal_high, inrange_low, inrange_high, outofrange_low_rule, outofrange_high_rule)
-VALUES ('Creatinine', 'mg/dL', 'female', '40-59', 0.6, 1.0, 0.5, 1.1, '< 0.5', '> 1.1')
+VALUES ('Creatinine', 'mg/dL', 'female', '40-59', 0.6, 0.9, NULL, NULL, '< 0.6', '> 0.9')
 ON CONFLICT (biomarker_name, sex, age_group) DO UPDATE SET
     optimal_low = EXCLUDED.optimal_low,
     optimal_high = EXCLUDED.optimal_high,
     inrange_low = EXCLUDED.inrange_low,
-    inrange_high = EXCLUDED.inrange_high;
+    inrange_high = EXCLUDED.inrange_high,
+    outofrange_low_rule = EXCLUDED.outofrange_low_rule,
+    outofrange_high_rule = EXCLUDED.outofrange_high_rule;
 
 -- Female, 60+
 INSERT INTO public.reference_ranges (biomarker_name, unit, sex, age_group, optimal_low, optimal_high, inrange_low, inrange_high, outofrange_low_rule, outofrange_high_rule)
-VALUES ('Creatinine', 'mg/dL', 'female', '60+', 0.6, 1.1, 0.5, 1.2, '< 0.5', '> 1.2')
+VALUES ('Creatinine', 'mg/dL', 'female', '60+', 0.6, 0.9, NULL, NULL, '< 0.6', '> 0.9')
 ON CONFLICT (biomarker_name, sex, age_group) DO UPDATE SET
     optimal_low = EXCLUDED.optimal_low,
     optimal_high = EXCLUDED.optimal_high,
     inrange_low = EXCLUDED.inrange_low,
-    inrange_high = EXCLUDED.inrange_high;
+    inrange_high = EXCLUDED.inrange_high,
+    outofrange_low_rule = EXCLUDED.outofrange_low_rule,
+    outofrange_high_rule = EXCLUDED.outofrange_high_rule;
 
 -- ----------------------------------------------------------------------------
 -- REFERENCE RANGES - CHOLESTEROL

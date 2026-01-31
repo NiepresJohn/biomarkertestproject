@@ -57,6 +57,10 @@ export function convertReferenceRangeToRangeBands(refRange: ReferenceRange): Ran
   const hasOptimal = refRange.optimal_low !== null && refRange.optimal_high !== null;
   const hasInRange = refRange.inrange_low !== null && refRange.inrange_high !== null;
 
+  // For Creatinine, ignore the in-range band and only use optimal + out-of-range
+  const isCreatinine = refRange.biomarker_name.toLowerCase().includes('creatinine');
+  const shouldUseInRange = hasInRange && !isCreatinine;
+
   // Add out-of-range low band (e.g., "<60" or "<0.7")
   if (refRange.outofrange_low_rule) {
     const max = parseOutOfRangeRule(refRange.outofrange_low_rule);
@@ -70,7 +74,8 @@ export function convertReferenceRangeToRangeBands(refRange: ReferenceRange): Ran
   }
 
   // Add in-range band if exists (MHS: orange "In range" between optimal and out-of-range)
-  if (hasInRange) {
+  // Skip for Creatinine - it only uses optimal and out-of-range
+  if (shouldUseInRange) {
     bands.push({
       label: 'In range',
       min: refRange.inrange_low,
@@ -87,7 +92,7 @@ export function convertReferenceRangeToRangeBands(refRange: ReferenceRange): Ran
       min: refRange.optimal_low,
       max: refRange.optimal_high,
       color: 'green',
-      order: hasInRange ? 3 : 2, // Order 3 if there's an in-range band, otherwise 2
+      order: shouldUseInRange ? 3 : 2, // Order 3 if there's an in-range band, otherwise 2
     });
   }
 
@@ -99,7 +104,7 @@ export function convertReferenceRangeToRangeBands(refRange: ReferenceRange): Ran
       min,
       max: null,
       color: 'red',
-      order: hasInRange ? 4 : 3, // Adjust order based on whether in-range exists
+      order: shouldUseInRange ? 4 : 3, // Adjust order based on whether in-range exists
     });
   }
 
