@@ -17,7 +17,7 @@ Production-ready healthcare application built with Next.js and Supabase, featuri
 - **Professional PDF Export**: Clean, filtered biomarker reports with print optimization
 
 ### Appointment Management
-- **Smart Scheduling**: Time-slot based booking (9 AM - 5 PM, 30-minute intervals)
+- **Smart Scheduling**: Time-slot based booking
 - **Conflict Prevention**: Real-time validation prevents double-booking
 - **Calendar Highlighting**: Visual indicators for days with scheduled appointments
 - **Multiple Booking Sources**: Schedule from calendar or biomarker modal
